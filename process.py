@@ -5,7 +5,6 @@ from pyspark.streaming.kafka import KafkaUtils
 from pyspark.streaming import StreamingContext
 
 import operator
-import pickle
 import json
 # import mysqlclient as MySQLdb
 # import mysqlclient 
@@ -17,17 +16,20 @@ import MySQLdb
 def insert_tweet(tweet,username,tweet_id):
     #query = "INSERT INTO tweets(tweet,username,pnr,prediction,tweet_id) VALUES ('%s','%s',%s,%s,%s);" % (tweet,username,str(pnr),str(int(prediction)))
     #query = "INSERT INTO tweets(tweet,username,pnr,prediction,tweet_id) VALUES ('"+tweet+"','"+username+"',"+str(pnr)+","+str(int(prediction))+","+str(tweet_id)+");"
-
     # query = "INSERT INTO tweets(tweet, username, tweet_id) VALUES ('"+tweet+"','"+username+"',"+str(tweet_id)+");"
-    query = "INSERT INTO tweets(tweet, username, tweet_id) VALUES ('%s','%s','%s');" % (tweet,username,str(tweet_id))
+    query = "INSERT INTO tweets(tweet,username,tweet_id) VALUES ('%s','%s','%s');" % (str(tweet),username,str(tweet_id))
     try:
-        conn = MySQLdb.connect("localhost","rishi","","twitter" )
+        # conn = MySQLdb.connect("localhost","rishi","","twitter")
+        conn = MySQLdb.connect("localhost","rishi","","twitter",charset="utf8mb4")
         cursor = conn.cursor()
         cursor.execute(query)
         print("Database insertion SUCCESSFUL!!")
         conn.commit()
     except MySQLdb.Error as e:
         print(e)
+        print(tweet)
+        print(username)
+        print(tweet_id)
         print("Database insertion unsuccessful!!")
     finally:
         conn.close()
@@ -45,45 +47,21 @@ kstream = KafkaUtils.createDirectStream(
 ssc, topics = ['twitterstream'], kafkaParams = {"metadata.broker.list": 'localhost:9092'})
 tweets = kstream.map(lambda x: json.loads(x[1]))
 
-# with open('IRModel', 'rb') as f:
-#     loadedModel = pickle.load(f)
-
-# bc_model = sc.broadcast(loadedModel)
-
-
 def process_data(data):
 
         print("Processing data ...")        
 
         if (not data.isEmpty()):
-            # nbModel=bc_model.value
-            # hashingTF = HashingTF(100000)
-            # tf = hashingTF.transform(data.map(lambda x: x[0].encode('utf-8','ignore')))
-            # tf.cache()
-            # idf = IDF(minDocFreq=2).fit(tf)
-            # tfidf = idf.transform(tf)
-            # tfidf.cache()
-            # prediction=nbModel.predict(tfidf)
-
             temp = []
             i=0
             for p,q,r in data.collect():
                 temp.append([])
-                temp[i].append(p.encode('utf-8','ignore'))
+                temp[i].append(p)
                 temp[i].append(q)
                 temp[i].append(r)
                 i+=1
             i=0
-            # for p in prediction.collect():
-            #     temp[i].append(p)
-            #     i+=1		
-
-            print(temp)
             for i in temp:
-                # insert_tweet(str(i[0]),str(i[1]),"0",int(i[3]),int(i[2]))
-                print(str(i[0]))
-                print(str(i[1]))
-                print(str(i[2]))
                 insert_tweet(str(i[0]),str(i[1]),int(i[2]))
         else:
             print("Empty RDD !!!")        
@@ -94,10 +72,6 @@ tweet_text = tweets.map(lambda tweet: tweet['text'])
 
 txt = tweets.map(lambda x: (x['text'], x['user']['screen_name'], x['id']))
 txt.foreachRDD(process_data)
-
-#text = tweet_text.map(lambda x: x.encode('utf-8','ignore'))
-#text.foreachRDD(process_data)
-
 
 ssc.start() 
 ssc.awaitTerminationOrTimeout(1000)

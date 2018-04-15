@@ -28,6 +28,5 @@ streamListner = MyStreamListener()
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 stream = tweepy.Stream(auth, streamListner)
-stream.filter(track="#")
-
-
+stream.filter(track="#",encoding='utf8')
+# stream.firehose(),languages = ['en']
