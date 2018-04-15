@@ -69,6 +69,7 @@ def process_data(data):
             i=0
             for p,q,r in data.collect():
                 temp.append([])
+                # temp[i].append(p.encode('utf-8','ignore'))
                 temp[i].append(p)
                 temp[i].append(q)
                 temp[i].append(r)
@@ -78,6 +79,7 @@ def process_data(data):
         else:
             print("Empty RDD !!!")        
             pass
+
 
 def process_tag(tag):
 
@@ -93,7 +95,6 @@ def process_tag(tag):
             print("Empty RDD !!!")        
             pass
 
-
 conf = SparkConf().setMaster("local[2]").setAppName("Streamer")
 sc = SparkContext(conf=conf)
 sc.setLogLevel("ERROR")
@@ -105,6 +106,7 @@ ssc.checkpoint("checkpoint")
 kstream = KafkaUtils.createDirectStream(
 ssc, topics = ['twitterstream'], kafkaParams = {"metadata.broker.list": 'localhost:9092'})
 tweets = kstream.map(lambda x: json.loads(x[1]))
+
 twitter=tweets.map(lambda tweet: tweet['user']['screen_name'])
 tweet_text = tweets.map(lambda tweet: tweet['text'])
 
