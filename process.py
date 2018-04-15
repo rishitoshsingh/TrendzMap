@@ -20,7 +20,7 @@ def insert_tweet(tweet,username,tweet_id):
     query = "INSERT INTO tweets(tweet,username,tweet_id) VALUES ('%s','%s','%s');" % (str(tweet),username,str(tweet_id))
     try:
         # conn = MySQLdb.connect("localhost","rishi","","twitter")
-        conn = MySQLdb.connect("localhost","rishi","","twitter",charset="utf8mb4")
+        conn = MySQLdb.connect("localhost","rishi","","trendzmap",charset="utf8mb4")
         cursor = conn.cursor()
         cursor.execute(query)
         print("Database insertion SUCCESSFUL!!")
@@ -33,6 +33,27 @@ def insert_tweet(tweet,username,tweet_id):
         print("Database insertion unsuccessful!!")
     finally:
         conn.close()
+
+def process_data(data):
+
+        print("Processing data ...")        
+
+        if (not data.isEmpty()):
+            temp = []
+            i=0
+            for p,q,r in data.collect():
+                temp.append([])
+                # temp[i].append(p.encode('utf-8','ignore'))
+                temp[i].append(p)
+                temp[i].append(q)
+                temp[i].append(r)
+                i+=1
+            i=0
+            for i in temp:
+                insert_tweet(str(i[0]),str(i[1]),int(i[2]))
+        else:
+            print("Empty RDD !!!")        
+            pass
 
 
 conf = SparkConf().setMaster("local[2]").setAppName("Streamer")
@@ -47,25 +68,6 @@ kstream = KafkaUtils.createDirectStream(
 ssc, topics = ['twitterstream'], kafkaParams = {"metadata.broker.list": 'localhost:9092'})
 tweets = kstream.map(lambda x: json.loads(x[1]))
 
-def process_data(data):
-
-        print("Processing data ...")        
-
-        if (not data.isEmpty()):
-            temp = []
-            i=0
-            for p,q,r in data.collect():
-                temp.append([])
-                temp[i].append(p)
-                temp[i].append(q)
-                temp[i].append(r)
-                i+=1
-            i=0
-            for i in temp:
-                insert_tweet(str(i[0]),str(i[1]),int(i[2]))
-        else:
-            print("Empty RDD !!!")        
-            pass
 
 twitter=tweets.map(lambda tweet: tweet['user']['screen_name'])
 tweet_text = tweets.map(lambda tweet: tweet['text'])
