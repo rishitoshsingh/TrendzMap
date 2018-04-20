@@ -11,11 +11,6 @@ import googlemaps
 gmaps = googlemaps.Client(key='AIzaSyDLeeuz2J1-KVSPXOiBd7hoBIQYXA9BIE4')
 # gmaps = googlemaps.Client(key='AIzaSyD3x9NEdpq8zBGQmV6pXSlD3vACBNChKhQ')
 
-def read_int(stream):
-    length = stream.read(4)
-    if not length:
-        raise EOFError
-    return struct.unpack("!i", length)[0]
 
 def extract_country(location):
     geocode_result = gmaps.geocode(location)
