@@ -5,7 +5,5 @@ This project is reverse engineering replication of Twitter Trends with ML capabi
 It uses Apche Kafka for ingesting the tweets. Apche Spark for proecessing and applying machine learning .
 ML algo used is naive bayes.<br>
 
-<img src ="https://github.com/aryanc55/TrendzMap/blob/master/assests/img1.jpeg" width="256" height="256" title="APP SCREENSHOT"><img src ="https://github.com/aryanc55/TrendzMap/blob/master/assests/img2.jpeg" width="256" height="256" title="APP SCREENSHOT">
-
-<img src ="https://github.com/aryanc55/TrendzMap/blob/master/assests/img3.jpeg" width="256" height="256" title="APP SCREENSHOT">
+<img src ="https://github.com/aryanc55/TrendzMap/blob/master/assests/img1.jpeg" width="256" height="256" title="APP SCREENSHOT"><img src ="https://github.com/aryanc55/TrendzMap/blob/master/assests/img2.jpeg" width="256" height="256" title="APP SCREENSHOT"><img src ="https://github.com/aryanc55/TrendzMap/blob/master/assests/img3.jpeg" width="256" height="256" title="APP SCREENSHOT">
 
